@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Visitor Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Arial, sans-serif;
+        }
+
+        body {
+            background: #0f0c29;
+            color: white;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Login Screen Styles */
+        .login-container {
+            max-width: 400px;
+            margin: 100px auto;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 40px;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+        }
+
+        .login-container h2 {
+            color: #a78bfa;
+            margin-bottom: 20px;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 14px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(0, 0, 0, 0.2);
+            color: white;
+            font-size: 14px;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #a78bfa;
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 12px;
+            background: #a78bfa;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background 0.3s;
+        }
+
+        .btn-login:hover {
+            background: #8b5cf6;
+        }
+
+        .error-msg {
+            color: #f87171;
+            font-size: 14px;
+            margin-top: 10px;
+            display: none;
+        }
+
+        h1 {
+            color: #a78bfa;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: rgba(255, 255, 255, 0.4);
+            margin-bottom: 30px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            margin: 20px 0 30px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .stat-number {
+            font-size: 32px;
+            font-weight: bold;
+            color: #a78bfa;
+        }
+
+        .stat-label {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .table-wrapper {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: rgba(167, 139, 250, 0.15);
+            padding: 14px 12px;
+            text-align: left;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            font-size: 14px;
+        }
+
+        tr:hover {
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .country-flag {
+            font-size: 20px;
+            margin-right: 8px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .badge-desktop {
+            background: rgba(96, 165, 250, 0.2);
+            color: #60a5fa;
+        }
+
+        .badge-mobile {
+            background: rgba(52, 211, 153, 0.2);
+            color: #34d399;
+        }
+
+        .badge-tablet {
+            background: rgba(251, 191, 36, 0.2);
+            color: #fbbf24;
+        }
+
+        .loading-text {
+            text-align: center;
+            padding: 40px;
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        .refresh-btn {
+            background: rgba(167, 139, 250, 0.2);
+            color: #a78bfa;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-left: 15px;
+            font-size: 14px;
+        }
+
+        .refresh-btn:hover {
+            background: rgba(167, 139, 250, 0.3);
+        }
+
+        .logout-btn {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-left: 10px;
+            font-size: 14px;
+        }
+
+        .logout-btn:hover {
+            background: rgba(239, 68, 68, 0.3);
+        }
+
+        .header-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        #dashboardView {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- Login View -->
+        <div id="loginView" class="login-container">
+            <h2>Admin Login</h2>
+            <div class="input-group">
+                <label>Email</label>
+                <input type="email" id="email" placeholder="admin@example.com" />
+            </div>
+            <div class="input-group">
+                <label>Password</label>
+                <input type="password" id="password" placeholder="••••••••" />
+            </div>
+            <button class="btn-login" onclick="login()">Login</button>
+            <div id="loginError" class="error-msg">Invalid credentials</div>
+        </div>
+
+        <!-- Dashboard View -->
+        <div id="dashboardView">
+            <div class="header-row">
+                <div>
+                    <h1>📊 Visitor Dashboard</h1>
+                    <div class="subtitle">Real-time visitor location tracking</div>
+                </div>
+                <div>
+                    <button class="refresh-btn" onclick="loadDashboard()">🔄 Refresh</button>
+                    <button class="logout-btn" onclick="logout()">🚪 Logout</button>
+                </div>
+            </div>
+
+            <div class="stats" id="stats">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalVisits">0</div>
+                    <div class="stat-label">Total Visits</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="uniqueCities">0</div>
+                    <div class="stat-label">Cities</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="uniqueCountries">0</div>
+                    <div class="stat-label">Countries</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="todayVisits">0</div>
+                    <div class="stat-label">Today</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="uniqueVisitors">0</div>
+                    <div class="stat-label">Unique IPs</div>
+                </div>
+            </div>
+
+            <div class="table-wrapper">
+                <table id="visitorTable">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>IP</th>
+                            <th>Location</th>
+                            <th>ISP</th>
+                            <th>Device</th>
+                            <th>Browser</th>
+                            <th>Page</th>
+                            <th>Referrer</th>
+                            <th>Time</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <tr>
+                            <td colspan="9" class="loading-text">Loading visitor data...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Your Supabase credentials
+        const _s1 = 'aHR0cHM6Ly9wcmF0eGdkcHlocXZqbXN6ZW1seS5zdXBhYmFzZS5jbw==';
+        const _s2 = 'ZXlKaGJHY2lPaUpJVXpJMU5pSXNJblI1Y0NJNklrcFhWQ0o5LmV5SnBjM01pT2lKemRYQmhZbUZ6WlNJc0luSmxaaUk2SW5CeVlYUjRaMlJ3ZVdodGRtcHRjM3BsYld4NUlpd2ljbTl1WlNJNkltRnViMjRpTENKcFlYUWlPakUzT0RFMk56UTFNREFzSW1WNGNDSTZNakE1TnpJMU1EVXdNRE0uTjJxTXJTM1ItT21LYkw2ZWhvck8ycHBWSHlvNFhYOVRqNnlwbS16cmRLVQ==';
+        const SUPABASE_URL = atob(_s1);
+        const SUPABASE_ANON_KEY = atob(_s2);
+
+        let accessToken = localStorage.getItem('supabase.auth.token');
+        let refreshInterval;
+
+        // Login function
+        async function login() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const errorEl = document.getElementById('loginError');
+            
+            errorEl.style.display = 'none';
+
+            if (!email || !password) {
+                errorEl.textContent = 'Please enter both email and password';
+                errorEl.style.display = 'block';
+                return;
+            }
+
+            try {
+                const response = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'apikey': SUPABASE_ANON_KEY
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error_description || data.msg || 'Login failed');
+                }
+
+                accessToken = data.access_token;
+                localStorage.setItem('supabase.auth.token', accessToken);
+                
+                showDashboard();
+            } catch (error) {
+                errorEl.textContent = error.message;
+                errorEl.style.display = 'block';
+            }
+        }
+
+        function logout() {
+            accessToken = null;
+            localStorage.removeItem('supabase.auth.token');
+            clearInterval(refreshInterval);
+            document.getElementById('dashboardView').style.display = 'none';
+            document.getElementById('loginView').style.display = 'block';
+            document.getElementById('email').value = '';
+            document.getElementById('password').value = '';
+        }
+
+        function showDashboard() {
+            document.getElementById('loginView').style.display = 'none';
+            document.getElementById('dashboardView').style.display = 'block';
+            loadDashboard();
+            
+            // Auto-refresh every 30 seconds
+            clearInterval(refreshInterval);
+            refreshInterval = setInterval(loadDashboard, 30000);
+        }
+
+        async function fetchVisits() {
+            const response = await fetch(`${SUPABASE_URL}/rest/v1/visitor_locations?order=created_at.desc&limit=200`, {
+                headers: {
+                    'apikey': SUPABASE_ANON_KEY,
+                    'Authorization': `Bearer ${accessToken}` // using the authenticated user token
+                }
+            });
+            if (!response.ok) {
+                if (response.status === 401 || response.status === 403) {
+                    logout(); // Token expired or invalid
+                    throw new Error('Session expired. Please login again.');
+                }
+                throw new Error('Failed to fetch data');
+            }
+            return await response.json();
+        }
+
+        function getFlagEmoji(countryCode) {
+            if (!countryCode) return '🌍';
+            return countryCode.toUpperCase().replace(/./g, char => String.fromCodePoint(127397 + char.charCodeAt()));
+        }
+
+        function getDeviceBadge(deviceType) {
+            const classes = {
+                'Desktop': 'badge-desktop',
+                'Mobile': 'badge-mobile',
+                'Tablet': 'badge-tablet'
+            };
+            return `<span class="badge ${classes[deviceType] || 'badge-desktop'}">${deviceType || 'Unknown'}</span>`;
+        }
+
+        async function loadDashboard() {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '<tr><td colspan="9" class="loading-text">⏳ Loading...</td></tr>';
+
+            try {
+                const visits = await fetchVisits();
+
+                // Update stats
+                document.getElementById('totalVisits').textContent = visits.length;
+                const cities = new Set(visits.map(v => v.city).filter(c => c && c !== 'N/A'));
+                const countries = new Set(visits.map(v => v.country).filter(c => c && c !== 'N/A'));
+                const ips = new Set(visits.map(v => v.ip_address).filter(ip => ip && ip !== 'N/A'));
+                document.getElementById('uniqueCities').textContent = cities.size;
+                document.getElementById('uniqueCountries').textContent = countries.size;
+                document.getElementById('uniqueVisitors').textContent = ips.size;
+
+                const today = new Date().toDateString();
+                const todayVisits = visits.filter(v => new Date(v.created_at).toDateString() === today);
+                document.getElementById('todayVisits').textContent = todayVisits.length;
+
+                // Populate table
+                if (visits.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="9" class="loading-text">No visits recorded yet.</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = visits.map((v, i) => {
+                    const flag = getFlagEmoji(v.country_code);
+                    const location = `${flag} ${v.city || 'Unknown'}, ${v.country || 'Unknown'}`;
+                    const deviceBadge = getDeviceBadge(v.device_type);
+                    const time = new Date(v.created_at).toLocaleString('en-US', {
+                        month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+                    });
+
+                    return `
+                        <tr>
+                            <td>${i + 1}</td>
+                            <td style="font-family: monospace; font-size: 13px;">${v.ip_address || 'N/A'}</td>
+                            <td>${location}</td>
+                            <td style="font-size: 13px; color: rgba(255,255,255,0.6);">${v.isp || 'N/A'}</td>
+                            <td>${deviceBadge}</td>
+                            <td>${v.browser || 'N/A'}</td>
+                            <td style="max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; color: rgba(255,255,255,0.6);">
+                                ${v.page_url ? new URL(v.page_url).pathname || '/' : 'N/A'}
+                            </td>
+                            <td style="max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; color: rgba(255,255,255,0.4);">
+                                ${v.referrer && v.referrer !== 'direct' ? new URL(v.referrer).hostname || v.referrer : 'Direct'}
+                            </td>
+                            <td style="font-size: 13px; color: rgba(255,255,255,0.5);">${time}</td>
+                        </tr>
+                    `;
+                }).join('');
+
+            } catch (error) {
+                console.error('Dashboard error:', error);
+                tbody.innerHTML = `<tr><td colspan="9" class="loading-text" style="color: #f87171;">❌ Error loading data: ${error.message}</td></tr>`;
+            }
+        }
+
+        // Check if already logged in on page open
+        if (accessToken) {
+            showDashboard();
+        }
+    </script>
+</body>
+
+</html>
